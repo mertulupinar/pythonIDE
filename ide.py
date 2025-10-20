@@ -3,6 +3,8 @@ import os
 import subprocess
 import ast
 import importlib
+import tempfile
+import time
 
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QPlainTextEdit, QTextEdit, QPushButton,
@@ -14,7 +16,7 @@ from PyQt5.QtGui import (
     QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QTextCursor, QPainter, QTextFormat,QIcon
 )
 
-from PyQt5.QtCore import QRegExp, Qt, QRect, QSize
+from PyQt5.QtCore import QRegExp, Qt, QRect, QSize, QTimer
 
 class Pide(QSyntaxHighlighter):
     def __init__(self, document):
@@ -94,7 +96,6 @@ class Pide(QSyntaxHighlighter):
 
         self._highlight_imports(text)
         self._highlight_variables(text)
-        self._parse_code_with_ast(text)
 
     def _highlight_imports(self, text):
         for module_set, fmt in [
@@ -128,7 +129,9 @@ class Pide(QSyntaxHighlighter):
             self.setFormat(pos, len(func_name), fmt)
             index = pattern.indexIn(text, index + pattern.matchedLength())
 
-    def _parse_code_with_ast(self, code):
+    def parse_full_document(self):
+        """Tüm dokümanı tek seferde parse et (her satır için değil)"""
+        code = self.document().toPlainText()
         try:
             tree = ast.parse(code)
             for node in ast.walk(tree):
@@ -235,6 +238,17 @@ class ModernCodeEditor(QPlainTextEdit):
         self.blockCountChanged.connect(self.update_line_number_area_width)
         self.updateRequest.connect(self.update_line_number_area)
         self.cursorPositionChanged.connect(self.highlight_current_line)
+        self.textChanged.connect(self._on_text_changed)
+        
+    def _on_text_changed(self):
+        """Metin değiştiğinde module'leri yeniden parse et"""
+        if hasattr(self, '_parse_timer'):
+            self._parse_timer.stop()
+        else:
+            self._parse_timer = QTimer()
+            self._parse_timer.setSingleShot(True)
+            self._parse_timer.timeout.connect(lambda: self.highlighter.parse_full_document())
+        self._parse_timer.start(1000)  # 1 saniye bekle
 
     def _init_state(self):
         self.update_line_number_area_width(0)
@@ -355,7 +369,7 @@ class ModernPythonIDE(QMainWindow):
         self.ICON_FILE   = os.path.join(self.BASE_DIR, "icons", "file.png")
 
         # Pencere ayarları
-        self.current_file = None
+        self.tab_file_paths = {}  # Her tab için dosya yolunu sakla
         self.setWindowTitle("PyIDE")
         self.setGeometry(100, 100, self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
 
@@ -526,8 +540,6 @@ class ModernPythonIDE(QMainWindow):
             self.LEFT_PANEL_WIDTH,
             self.WINDOW_WIDTH - self.LEFT_PANEL_WIDTH
         ])
-        project_path = os.getcwd()  # veya varsayılan bir yol
-        self.populate_file_tree(project_path)
 
 
     def _init_left_panel(self, parent_splitter):
@@ -566,11 +578,18 @@ class ModernPythonIDE(QMainWindow):
                 background-color: #094771;
             }
         """)
+        self.file_tree.itemDoubleClicked.connect(self._on_file_tree_double_click)
         layout.addWidget(self.file_tree)
 
         parent_splitter.addWidget(left_panel)
         project_path = os.getcwd()
         self.populate_file_tree(project_path)
+        
+    def _on_file_tree_double_click(self, item, column):
+        """Dosya tree'de double-click yapılınca dosyayı aç"""
+        file_path = item.data(0, Qt.UserRole)
+        if file_path and os.path.isfile(file_path):
+            self.open_file_from_path(file_path)
 
 
     def _init_editor_tabs(self, parent_splitter):
@@ -730,10 +749,19 @@ class ModernPythonIDE(QMainWindow):
         return editor
 
     def close_tab(self, index):
+        # Tab'ı kapatırken dosya yolunu da temizle
+        if index in self.tab_file_paths:
+            del self.tab_file_paths[index]
+            
         if self.editor_tabs.count() > 1:
             self.editor_tabs.removeTab(index)
+            # Index'leri yeniden düzenle
+            self.tab_file_paths = {
+                i if i < index else i-1: path 
+                for i, path in self.tab_file_paths.items()
+            }
         else:
-            # Don't close the last tab, just clear it
+            # Son tab'ı kapatma, sadece temizle
             current_editor = self.editor_tabs.currentWidget()
             if current_editor:
                 current_editor.clear()
@@ -748,27 +776,41 @@ class ModernPythonIDE(QMainWindow):
         filename, _ = QFileDialog.getOpenFileName(self, 'Open File', '', 
                                                   'Python Files (*.py);;All Files (*)')
         if filename:
-            try:
-                with open(filename, 'r', encoding='utf-8') as file:
-                    content = file.read()
+            self.open_file_from_path(filename)
+            
+    def open_file_from_path(self, filename):
+        """Belirtilen dosyayı aç (file tree'den veya dialog'dan)"""
+        # Dosya zaten açıksa o tab'a geç
+        for tab_idx, path in self.tab_file_paths.items():
+            if path == filename:
+                self.editor_tabs.setCurrentIndex(tab_idx)
+                return
                 
-                editor = self.add_new_tab(os.path.basename(filename))
-                editor.setPlainText(content)
-                self.current_file = filename
-                self.statusBar().showMessage(f'Opened: {filename}')
-            except Exception as e:
-                QMessageBox.critical(self, 'Error', f'Could not open file:\n{str(e)}')
+        try:
+            with open(filename, 'r', encoding='utf-8') as file:
+                content = file.read()
+            
+            editor = self.add_new_tab(os.path.basename(filename))
+            editor.setPlainText(content)
+            tab_idx = self.editor_tabs.currentIndex()
+            self.tab_file_paths[tab_idx] = filename
+            self.statusBar().showMessage(f'Opened: {filename}')
+        except Exception as e:
+            QMessageBox.critical(self, 'Error', f'Could not open file:\n{str(e)}')
 
     def save_file(self):
         current_editor = self.get_current_editor()
         if not current_editor:
             return
+        
+        current_tab_idx = self.editor_tabs.currentIndex()
+        current_file = self.tab_file_paths.get(current_tab_idx)
             
-        if self.current_file:
+        if current_file:
             try:
-                with open(self.current_file, 'w', encoding='utf-8') as file:
+                with open(current_file, 'w', encoding='utf-8') as file:
                     file.write(current_editor.toPlainText())
-                self.statusBar().showMessage(f'Saved: {self.current_file}')
+                self.statusBar().showMessage(f'Saved: {current_file}')
             except Exception as e:
                 QMessageBox.critical(self, 'Error', f'Could not save file:\n{str(e)}')
         else:
@@ -785,21 +827,39 @@ class ModernPythonIDE(QMainWindow):
             try:
                 with open(filename, 'w', encoding='utf-8') as file:
                     file.write(current_editor.toPlainText())
-                self.current_file = filename
-                current_tab_index = self.editor_tabs.currentIndex()
-                self.editor_tabs.setTabText(current_tab_index, os.path.basename(filename))
+                current_tab_idx = self.editor_tabs.currentIndex()
+                self.tab_file_paths[current_tab_idx] = filename
+                self.editor_tabs.setTabText(current_tab_idx, os.path.basename(filename))
                 self.statusBar().showMessage(f'Saved: {filename}')
             except Exception as e:
                 QMessageBox.critical(self, 'Error', f'Could not save file:\n{str(e)}')
 
         #icon functions
     def populate_file_tree(self, root_path):
+        """Dosya ağacını optimize edilmiş şekilde doldur"""
         self.file_tree.clear()
+        
+        SKIP_DIRS = {'.git', '__pycache__', '.vscode', '.idea', 'node_modules', 'venv', '.env'}
+        SHOW_EXTENSIONS = {'.py', '.txt', '.md', '.json', '.yaml', '.yml', '.toml', '.ini', '.cfg'}
 
         def add_items(parent_item, path):
-            for name in os.listdir(path):
+            try:
+                items = sorted(os.listdir(path))
+            except PermissionError:
+                return
+                
+            for name in items:
+                if name.startswith('.') and name not in {'.gitignore'}:
+                    continue
+                    
                 full_path = os.path.join(path, name)
                 is_dir = os.path.isdir(full_path)
+
+                if is_dir and name in SKIP_DIRS:
+                    continue
+                    
+                if not is_dir and not any(name.endswith(ext) for ext in SHOW_EXTENSIONS):
+                    continue
 
                 icon = QIcon(self.ICON_FOLDER) if is_dir else self._get_icon_for_file(name)
 
@@ -834,47 +894,74 @@ class ModernPythonIDE(QMainWindow):
 
         code = current_editor.toPlainText().strip()
         if not code:
-            self.console.setText("No code to run!")
+            self.console.setText("Çalıştırılacak kod yok!")
             return
 
         self.console.clear()
-        self.console.append("Running Python code...\n" + "=" * 50)
+        self.console.append("Python kodu çalıştırılıyor...\n" + "=" * 50)
 
         try:
-            # Kullanıcı input istiyor mu?
-            user_input = None
+            # Kodu geçici dosyaya kaydet
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False, encoding='utf-8') as temp_file:
+                temp_file.write(code)
+                temp_file_path = temp_file.name
+
+            # Input varsa yeni console penceresi aç, yoksa arka planda çalıştır
             if "input(" in code:
-                user_input, ok = QInputDialog.getText(self, "Kullanıcı Girdisi", "input() fonksiyonu için değer girin:")
-                if not ok:
-                    self.console.append("\nİptal edildi.")
-                    return
+                self.console.append("\n<b style='color:#4caf50'>→ Kod yeni konsol penceresinde çalıştırılıyor...</b>")
+                self.console.append("<i>Program tamamlanınca konsol penceresi kapanacak.</i>\n")
+                
+                if sys.platform == "win32":
+                    # Windows: cmd ile aç - sys.executable kullan
+                    python_exe = sys.executable.replace('\\', '/')
+                    subprocess.Popen(
+                        f'start cmd /k ""{python_exe}" "{temp_file_path}" & echo. & echo Program tamamlandi. Kapatmak icin bir tusa basin... & pause > nul & exit"',
+                        shell=True
+                    )
+                else:
+                    # Linux/Mac: terminal ile aç
+                    subprocess.Popen(['x-terminal-emulator', '-e', f'{sys.executable} {temp_file_path}; read -p "Press enter to close..."'])
+                
+                self.statusBar().showMessage("Kod yeni konsol penceresinde çalışıyor")
+                
+            else:
+                # Input yoksa arka planda çalıştır ve çıktıyı göster
+                process = subprocess.Popen(
+                    [sys.executable, temp_file_path],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+                )
 
-            # Subprocess başlat
-            process = subprocess.Popen(
-                [sys.executable, "-c", code],
-                stdin=subprocess.PIPE if user_input else None,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
-            )
+                output, error = process.communicate(timeout=30)
 
-            output, error = process.communicate(input=user_input, timeout=10)
+                if output:
+                    self.console.append(f"\n<b>Çıktı:</b>\n{output}")
+                if error:
+                    self.console.append(f"\n<b style='color:#f44336'>Hatalar:</b>\n{error}")
+                if not output and not error:
+                    self.console.append("\n<b style='color:#4caf50'>✓ Kod başarıyla çalıştı (çıktı yok)</b>")
 
-            if output:
-                self.console.append(f"\nOutput:\n{output}")
-            if error:
-                self.console.append(f"\nErrors:\n{error}")
-            if not output and not error:
-                self.console.append("\nCode executed successfully (no output)")
+                self.statusBar().showMessage("Kod çalıştırma tamamlandı")
+                
+            # Geçici dosyayı sil (biraz bekle)
+            def cleanup():
+                time.sleep(2)
+                try:
+                    os.unlink(temp_file_path)
+                except:
+                    pass
+            
+            from threading import Thread
+            Thread(target=cleanup, daemon=True).start()
 
         except subprocess.TimeoutExpired:
             process.kill()
-            self.console.append("\nError: Code execution timed out (10 seconds)")
+            self.console.append("\n<b style='color:#f44336'>Hata: Kod çalıştırma zaman aşımına uğradı (30 saniye)</b>")
         except Exception as e:
-            self.console.append(f"\nUnexpected error: {str(e)}")
-
-        self.statusBar().showMessage("Code execution completed")
+            self.console.append(f"\n<b style='color:#f44336'>Beklenmeyen hata:</b> {str(e)}")
+            self.statusBar().showMessage("Hata oluştu")
 
 
 if __name__ == "__main__":
