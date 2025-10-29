@@ -397,7 +397,7 @@ pip install PyQt5
 1. **Clone or Download**:
 
    ```bash
-   git clone https://github.com/oxynos/pyide.git
+   git clone https://github.com/https:/mertulupinar/pyide.git
    cd pyide
    ```
 
@@ -1018,7 +1018,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ```
 MIT License
 
-Copyright (c) 2024 Oxynos
+Copyright (c) 2024 Mert Ulupınar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
