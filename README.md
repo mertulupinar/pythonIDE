@@ -11,7 +11,7 @@
 
 # 🐍 PyIDE — Professional Python Development Environment
 
-### *Created by* **Oxynos** 🚀
+### _Created by_ **Oxynos** 🚀
 
 [![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![PyQt5](https://img.shields.io/badge/PyQt5-5.15+-green.svg)](https://pypi.org/project/PyQt5/)
@@ -61,6 +61,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 ### 🎨 **Advanced Code Editor**
 
 #### **Intelligent Syntax Highlighting**
+
 - **Why**: Makes code more readable and helps identify syntax errors instantly
 - **How**: Uses custom `QSyntaxHighlighter` with regex patterns
 - **Features**:
@@ -73,6 +74,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
   - Function calls with color-coded validation
 
 #### **Smart Code Features**
+
 - **Line Numbers**: Custom painted line number area with dynamic width
 - **Current Line Highlighting**: Visual indicator for active line
 - **Auto-Indentation**: Automatically indents after colons (`:`)
@@ -80,6 +82,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 - **Tab to Spaces**: Converts tabs to 4 spaces for PEP 8 compliance
 
 #### **Intelligent Autocomplete (Ctrl+Space)**
+
 - **Why**: Speed up coding by suggesting completions as you type
 - **How**: Uses `QCompleter` with pre-populated word lists
 - **Features**:
@@ -96,6 +99,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
   - Common modules: `os`, `sys`, `math`, `random`, `json`, `re`, etc.
 
 #### **Minimap Code Overview**
+
 - **Why**: Navigate large files quickly and see code structure at a glance
 - **How**: Custom painted widget showing miniature code representation
 - **Features**:
@@ -111,6 +115,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 ### 🐛 **Error Detection & Debugging**
 
 #### **Real-Time Error Highlighting**
+
 - **Why**: Instantly see where errors occur without searching through output
 - **How**: Parses stderr output using regex to extract line numbers
 - **Features**:
@@ -120,6 +125,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
   - Persistent highlighting until next run
 
 #### **Integrated Debugger (pdb)**
+
 - **Why**: Step through code line-by-line to understand program flow
 - **How**: Launches Python's built-in debugger in a separate terminal
 - **Usage**: Press `Shift+F5` or go to `Run → Debug Mode`
@@ -134,6 +140,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 ### 🔍 **Search & Edit Tools**
 
 #### **Find & Replace Dialog (Ctrl+F)**
+
 - **Why**: Quickly search and modify text across your code
 - **How**: Uses `QTextDocument` search with regex support
 - **Features**:
@@ -154,6 +161,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
   - `Enter`: Replace current and find next
 
 #### **Code Snippets (Tab Expansion)**
+
 - **Why**: Write boilerplate code faster with templates
 - **How**: Type trigger word + Tab to expand into full template
 - **Built-in Snippets**:
@@ -162,7 +170,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
      def function_name():
          pass
      ```
-  2. **`class` + Tab**: Class template with __init__
+  2. **`class` + Tab**: Class template with **init**
      ```python
      class ClassName:
          def __init__(self):
@@ -209,6 +217,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 ### 📂 **File Management**
 
 #### **Dynamic File Explorer**
+
 - **Why**: Quick navigation and project organization with real-time updates
 - **How**: Uses `QTreeWidget` with `QFileSystemWatcher` for live monitoring
 - **Features**:
@@ -228,6 +237,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
   - **Cross-Platform**: Works on Windows (Explorer), macOS (Finder), Linux (xdg-open)
 
 #### **Multi-Tab Editor**
+
 - **Why**: Work with multiple files simultaneously
 - **Features**:
   - Unlimited tabs
@@ -239,6 +249,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 ### 💻 **Terminal Integration**
 
 #### **Embedded Terminal**
+
 - **Why**: Execute commands without leaving the IDE
 - **How**: Uses `QProcess` to embed cmd/bash
 - **Features**:
@@ -251,6 +262,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 ### 🏃 **Code Execution**
 
 #### **Smart Run System**
+
 - **Why**: Execute Python code with proper handling of input/output
 - **How**: Uses `subprocess` with temporary file execution
 - **Features**:
@@ -263,6 +275,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 ### 📦 **Package Manager (pip)**
 
 #### **Visual pip Interface**
+
 - **Why**: Manage Python packages without command line
 - **How**: Wraps pip commands with GUI controls
 - **Features**:
@@ -278,6 +291,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 ### 🔀 **Git Integration**
 
 #### **Visual Git Interface**
+
 - **Why**: Version control without command line
 - **How**: Executes git commands via subprocess with GUI feedback
 - **Features**:
@@ -294,37 +308,46 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 ### 🎨 **Theme System**
 
 #### **7 Professional Built-in Themes**
+
 - **Why**: Reduce eye strain and personalize appearance
 - **How**: Dynamic stylesheet switching with instant apply
 - **Themes**:
+
   1. **⚫ Default (VS Code Dark)**: Classic dark theme with blue accents
+
      - Background: `#1e1e1e`, Accent: `#007acc`
      - Best for: General use, VS Code users
-  
+
   2. **🧛 Dracula**: Popular purple-accented dark theme
+
      - Background: `#282a36`, Accent: `#bd93f9`
      - Best for: Night coding, purple lovers
-  
+
   3. **🌊 Nord**: Arctic-inspired blue/cyan theme
+
      - Background: `#2e3440`, Accent: `#88c0d0`
      - Best for: Calm, professional look
-  
+
   4. **🌙 Monokai**: Sublime Text's classic theme
+
      - Background: `#272822`, Accent: `#a6e22e`
      - Best for: Long coding sessions, Sublime users
-  
+
   5. **☀️ Solarized Dark**: Scientific color precision theme
+
      - Background: `#002b36`, Accent: `#b58900`
      - Best for: Reduced eye strain, academic work
-  
+
   6. **🔵 One Dark (Atom)**: Atom editor's default theme
+
      - Background: `#282c34`, Accent: `#98c379`
      - Best for: Modern look, Atom users
-  
+
   7. **🐙 GitHub Dark**: GitHub's official dark theme
+
      - Background: `#0d1117`, Accent: `#f78166`
      - Best for: GitHub integration, familiar interface
-  
+
   8. **🟤 Gruvbox**: Retro warm theme
      - Background: `#282828`, Accent: `#fabd2f`
      - Best for: Vintage feel, Vim users
@@ -335,6 +358,7 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 ### 📊 **Output Console**
 
 #### **Dual-Panel System**
+
 - **Output Tab**: Shows Python script results
 - **Terminal Tab**: Interactive command line
 - **Features**:
@@ -362,6 +386,7 @@ pip install PyQt5
 ```
 
 **Why PyQt5?**
+
 - Cross-platform GUI framework
 - Professional-grade widgets
 - Excellent performance
@@ -370,16 +395,20 @@ pip install PyQt5
 ### 🚀 Quick Start
 
 1. **Clone or Download**:
+
    ```bash
    git clone https://github.com/oxynos/pyide.git
    cd pyide
    ```
 
 2. **Install Requirements**:
+
    ```bash
    pip install -r requirements.txt
    ```
-   *Or manually*:
+
+   _Or manually_:
+
    ```bash
    pip install PyQt5
    ```
@@ -412,7 +441,7 @@ pythonIDE/
 ### Getting Started
 
 1. **Launch PyIDE**: Run `python ide.py`
-2. **Open a File**: 
+2. **Open a File**:
    - Click `File → Open` or press `Ctrl+O`
    - Or double-click a file in the explorer
 3. **Write Code**: Use the main editor with syntax highlighting
@@ -422,15 +451,19 @@ pythonIDE/
 ### Working with Files
 
 #### Creating New Files
+
 ```
 File → New (Ctrl+N)
 ```
+
 Opens a new untitled tab. Use `Save As` to give it a name.
 
 #### Opening Projects
+
 The file explorer shows your current working directory. Files are automatically filtered to show only relevant types.
 
 #### Saving Work
+
 ```
 File → Save (Ctrl+S)
 File → Save As (Ctrl+Shift+S)
@@ -439,21 +472,25 @@ File → Save As (Ctrl+Shift+S)
 ### Running Code
 
 #### Method 1: No Input Required
+
 ```python
 # Example
 print("Hello, World!")
 for i in range(5):
     print(f"Number: {i}")
 ```
+
 Press `F5` → Output appears in the Output tab.
 
 #### Method 2: With Input
+
 ```python
 # Example
 name = input("Your name: ")
 age = input("Your age: ")
 print(f"Hello {name}, you are {age} years old!")
 ```
+
 Press `F5` → New terminal window opens for interaction.
 
 ### Managing Packages
@@ -469,12 +506,14 @@ Press `F5` → New terminal window opens for interaction.
 ### Using Autocomplete
 
 1. **Automatic Popup**:
+
    - Start typing: `pri`
    - Autocomplete appears after 2 characters
    - Use arrow keys to select `print`
    - Press `Enter` to insert
 
 2. **Manual Trigger**:
+
    - Type partial word: `ma`
    - Press `Ctrl+Space`
    - Select from suggestions: `map`, `max`, `math`, etc.
@@ -487,6 +526,7 @@ Press `F5` → New terminal window opens for interaction.
 ### Using Snippets
 
 1. **Function Snippet**:
+
    ```python
    # Type: def
    # Press: Tab
@@ -496,6 +536,7 @@ Press `F5` → New terminal window opens for interaction.
    ```
 
 2. **Class Snippet**:
+
    ```python
    # Type: class
    # Press: Tab
@@ -519,12 +560,14 @@ Press `F5` → New terminal window opens for interaction.
 ### Using Find & Replace
 
 1. **Basic Search**:
+
    - Press `Ctrl+F`
    - Type search term: `variable_name`
    - Press `F3` to find next
    - Press `Shift+F3` to find previous
 
 2. **Replace Text**:
+
    - Press `Ctrl+F`
    - Find: `old_name`
    - Replace: `new_name`
@@ -539,6 +582,7 @@ Press `F5` → New terminal window opens for interaction.
 ### Using Minimap
 
 1. **Quick Navigation**:
+
    - Look at minimap on right side
    - Click anywhere to jump to that line
    - Blue highlight shows current view
@@ -551,20 +595,23 @@ Press `F5` → New terminal window opens for interaction.
 ### Using Dynamic File Explorer
 
 1. **Basic Operations**:
+
    - **Open File**: Double-click any file
    - **Refresh**: Click 🔄 button in header
    - **Auto-Refresh**: Files update automatically when changed
 
 2. **Create New Items**:
+
    ```
    Right-click in explorer → 📄 New File
    Enter name: "config.py" → File created and appears instantly
-   
+
    Right-click in explorer → 📁 New Folder
    Enter name: "utils" → Folder created
    ```
 
 3. **Rename**:
+
    ```
    Right-click file → ✏️ Rename
    Change "old_name.py" to "new_name.py"
@@ -572,6 +619,7 @@ Press `F5` → New terminal window opens for interaction.
    ```
 
 4. **Delete**:
+
    ```
    Right-click file/folder → 🗑️ Delete
    Confirm deletion (⚠️ Cannot be undone!)
@@ -579,6 +627,7 @@ Press `F5` → New terminal window opens for interaction.
    ```
 
 5. **Show in System Explorer**:
+
    ```
    Right-click file → 📂 Show in Explorer
    Opens Windows Explorer/Finder/File Manager
@@ -593,10 +642,12 @@ Press `F5` → New terminal window opens for interaction.
 ### Switching Themes
 
 1. **Open Theme Menu**:
+
    - Click `🎨 Theme` in menu bar
    - See 8 available themes
 
 2. **Apply Theme**:
+
    ```
    Theme → 🧛 Dracula → Instant purple theme
    Theme → 🌊 Nord → Instant blue/cyan theme
@@ -640,21 +691,25 @@ Press `F5` → New terminal window opens for interaction.
 ### Code Structure
 
 #### **1. Syntax Highlighter (`Pide` class)**
+
 ```python
 class Pide(QSyntaxHighlighter):
 ```
+
 - **Purpose**: Real-time code coloring
 - **Technology**: `QSyntaxHighlighter` + `QRegExp`
-- **Features**: 
+- **Features**:
   - Pattern matching for keywords
   - Dynamic module loading via `importlib`
   - Function validation via `hasattr`
   - Caching for performance
 
 #### **2. Code Editor (`ModernCodeEditor` class)**
+
 ```python
 class ModernCodeEditor(QPlainTextEdit):
 ```
+
 - **Purpose**: Main text editing widget
 - **Technology**: `QPlainTextEdit` with custom painting
 - **Features**:
@@ -666,9 +721,11 @@ class ModernCodeEditor(QPlainTextEdit):
   - Signal/slot connections
 
 #### **3. Line Numbers (`LineNumberArea` class)**
+
 ```python
 class LineNumberArea(QWidget):
 ```
+
 - **Purpose**: Display line numbers
 - **Technology**: Custom `paintEvent` with `QPainter`
 - **Features**:
@@ -677,9 +734,11 @@ class LineNumberArea(QWidget):
   - Custom styling
 
 #### **4. Minimap (`Minimap` class)**
+
 ```python
 class Minimap(QWidget):
 ```
+
 - **Purpose**: Code overview and quick navigation
 - **Technology**: Custom painting with line density visualization
 - **Features**:
@@ -689,9 +748,11 @@ class Minimap(QWidget):
   - Real-time updates
 
 #### **5. Find & Replace Dialog (`FindReplaceDialog` class)**
+
 ```python
 class FindReplaceDialog(QDialog):
 ```
+
 - **Purpose**: Search and text replacement
 - **Technology**: `QTextDocument` find with regex
 - **Features**:
@@ -701,9 +762,11 @@ class FindReplaceDialog(QDialog):
   - Modeless dialog
 
 #### **6. Terminal Widget (`TerminalWidget` class)**
+
 ```python
 class TerminalWidget(QWidget):
 ```
+
 - **Purpose**: Embedded terminal
 - **Technology**: `QProcess` for process management
 - **Features**:
@@ -712,9 +775,11 @@ class TerminalWidget(QWidget):
   - Color-coded output
 
 #### **7. Main IDE Window (`ModernPythonIDE` class)**
+
 ```python
 class ModernPythonIDE(QMainWindow):
 ```
+
 - **Purpose**: Main application window
 - **Technology**: `QMainWindow` with splitters
 - **Layout**:
@@ -739,59 +804,62 @@ class ModernPythonIDE(QMainWindow):
 
 ### PyQt5 Components
 
-| Component | Purpose | Why |
-|-----------|---------|-----|
-| `QMainWindow` | Main window container | Professional app structure |
-| `QPlainTextEdit` | Code editor | Efficient for large text |
-| `QSyntaxHighlighter` | Syntax coloring | Real-time pattern matching |
-| `QTreeWidget` | File explorer | Hierarchical data display |
-| `QTabWidget` | Multi-file tabs | Document management |
-| `QSplitter` | Resizable panels | Flexible layout |
-| `QProcess` | External processes | Terminal & code execution |
-| `QPainter` | Custom drawing | Line numbers & minimap |
-| `QTextEdit` | Output console | Rich text support |
-| `QFileSystemWatcher` | File monitoring | Auto-refresh explorer |
-| `QMenu` | Context menus | Right-click actions |
-| `QCompleter` | Autocomplete | Code completion |
+| Component            | Purpose               | Why                        |
+| -------------------- | --------------------- | -------------------------- |
+| `QMainWindow`        | Main window container | Professional app structure |
+| `QPlainTextEdit`     | Code editor           | Efficient for large text   |
+| `QSyntaxHighlighter` | Syntax coloring       | Real-time pattern matching |
+| `QTreeWidget`        | File explorer         | Hierarchical data display  |
+| `QTabWidget`         | Multi-file tabs       | Document management        |
+| `QSplitter`          | Resizable panels      | Flexible layout            |
+| `QProcess`           | External processes    | Terminal & code execution  |
+| `QPainter`           | Custom drawing        | Line numbers & minimap     |
+| `QTextEdit`          | Output console        | Rich text support          |
+| `QFileSystemWatcher` | File monitoring       | Auto-refresh explorer      |
+| `QMenu`              | Context menus         | Right-click actions        |
+| `QCompleter`         | Autocomplete          | Code completion            |
 
 ### Python Standard Library
 
-| Module | Purpose |
-|--------|---------|
+| Module       | Purpose                        |
+| ------------ | ------------------------------ |
 | `subprocess` | Execute Python code & commands |
-| `ast` | Parse code for imports |
-| `importlib` | Dynamic module loading |
-| `tempfile` | Temporary file handling |
-| `re` | Regex for error parsing |
-| `os` | File system operations |
+| `ast`        | Parse code for imports         |
+| `importlib`  | Dynamic module loading         |
+| `tempfile`   | Temporary file handling        |
+| `re`         | Regex for error parsing        |
+| `os`         | File system operations         |
 
 ---
 
 ## ⌨️ Keyboard Shortcuts
 
 ### File Operations
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+N` | New file |
-| `Ctrl+O` | Open file |
-| `Ctrl+S` | Save file |
-| `Ctrl+Shift+S` | Save as |
-| `Ctrl+Q` | Quit application |
+
+| Shortcut       | Action           |
+| -------------- | ---------------- |
+| `Ctrl+N`       | New file         |
+| `Ctrl+O`       | Open file        |
+| `Ctrl+S`       | Save file        |
+| `Ctrl+Shift+S` | Save as          |
+| `Ctrl+Q`       | Quit application |
 
 ### Code Editing
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+Space` | Show autocomplete suggestions |
-| `Ctrl+F` | Open Find & Replace dialog |
-| `F3` | Find next |
-| `Shift+F3` | Find previous |
-| `Tab` | Insert 4 spaces OR expand snippet |
-| `Enter` | Auto-indent |
+
+| Shortcut     | Action                            |
+| ------------ | --------------------------------- |
+| `Ctrl+Space` | Show autocomplete suggestions     |
+| `Ctrl+F`     | Open Find & Replace dialog        |
+| `F3`         | Find next                         |
+| `Shift+F3`   | Find previous                     |
+| `Tab`        | Insert 4 spaces OR expand snippet |
+| `Enter`      | Auto-indent                       |
 
 ### Code Execution
-| Shortcut | Action |
-|----------|--------|
-| `F5` | Run Python file |
+
+| Shortcut   | Action           |
+| ---------- | ---------------- |
+| `F5`       | Run Python file  |
 | `Shift+F5` | Debug mode (pdb) |
 
 ---
@@ -799,6 +867,7 @@ class ModernPythonIDE(QMainWindow):
 ## 📸 Screenshots
 
 ### Main Interface with Minimap
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  File  Edit  Run  Tools  Theme                             │
@@ -822,6 +891,7 @@ class ModernPythonIDE(QMainWindow):
 ```
 
 ### Find & Replace Dialog
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  Find & Replace                             × │
@@ -839,6 +909,7 @@ class ModernPythonIDE(QMainWindow):
 ```
 
 ### Snippet Expansion
+
 ```
 Before:           After pressing Tab:
 ────────          ─────────────────────
@@ -858,6 +929,7 @@ try|              try:
 ```
 
 ### Dynamic File Explorer with Context Menu
+
 ```
 ┌─────────────────────────┐
 │ EXPLORER          🔄    │  ← Refresh button
@@ -876,6 +948,7 @@ try|              try:
 ```
 
 ### Theme Gallery
+
 ```
 ⚫ Default (VS Code)    🧛 Dracula             🌊 Nord
 ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
@@ -914,6 +987,7 @@ Contributions are welcome! Here's how you can help:
 ### Feature Ideas
 
 Completed ✅:
+
 - [x] Code completion (autocomplete) - **Ctrl+Space**
 - [x] Find & Replace (Ctrl+F) - **With regex support**
 - [x] Code snippets - **Tab expansion**
@@ -923,6 +997,7 @@ Completed ✅:
 - [x] 7 Professional themes - **Dracula, Nord, Monokai, Solarized, One Dark, GitHub, Gruvbox**
 
 Planned 📋:
+
 - [ ] Multi-cursor support (Ctrl+Click)
 - [ ] Code folding (collapse functions/classes)
 - [ ] Plugin system
@@ -973,11 +1048,9 @@ copies or substantial portions of the Software.
 
 ### 🌟 If you like PyIDE, give it a star! ⭐
 
-**Made with ❤️ by Oxynos**
-
-[![GitHub](https://img.shields.io/badge/GitHub-Oxynos-black?style=flat&logo=github)](https://github.com/oxynos)
+[![GitHub](https://img.shields.io/badge/GitHub-Oxynos-black?style=flat&logo=github)](https://https://github.com/mertulupinar)
 [![Python](https://img.shields.io/badge/Python-Powered-blue?style=flat&logo=python)](https://python.org)
 
-*Happy Coding! 🚀*
+_Happy Coding! 🚀_
 
 </div>
