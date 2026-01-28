@@ -2123,7 +2123,7 @@ class ModernPythonIDE(QMainWindow):
         toolbar.addWidget(run_btn)
 
     def setup_statusbar(self):
-        self.statusBar().showMessage('PyIDE Ready | Created by Oxynos 🚀')
+        self.statusBar().showMessage('PyIDE Ready | Created by Mert Ulupınar 🚀')
 
     def add_new_tab(self, filename="Untitled"):
         editor = ModernCodeEditor()

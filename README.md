@@ -11,7 +11,7 @@
 
 # 🐍 PyIDE — Professional Python Development Environment
 
-### _Created by_ **Oxynos** 🚀
+### _Created by_ **Mert Ulupınar** 🚀
 
 [![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![PyQt5](https://img.shields.io/badge/PyQt5-5.15+-green.svg)](https://pypi.org/project/PyQt5/)
@@ -1048,7 +1048,7 @@ copies or substantial portions of the Software.
 
 ### 🌟 If you like PyIDE, give it a star! ⭐
 
-[![GitHub](https://img.shields.io/badge/GitHub-Oxynos-black?style=flat&logo=github)](https://https://github.com/mertulupinar)
+[![GitHub](https://img.shields.io/badge/GitHub-mertulupinar-black?style=flat&logo=github)](https://github.com/mertulupinar)
 [![Python](https://img.shields.io/badge/Python-Powered-blue?style=flat&logo=python)](https://python.org)
 
 _Happy Coding! 🚀_
