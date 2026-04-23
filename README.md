@@ -1,17 +1,8 @@
 <div align="center">
 
-```
- ██████╗ ██╗  ██╗██╗   ██╗███╗   ██╗ ██████╗ ███████╗
-██╔═══██╗╚██╗██╔╝╚██╗ ██╔╝████╗  ██║██╔═══██╗██╔════╝
-██║   ██║ ╚███╔╝  ╚████╔╝ ██╔██╗ ██║██║   ██║███████╗
-██║   ██║ ██╔██╗   ╚██╔╝  ██║╚██╗██║██║   ██║╚════██║
-╚██████╔╝██╔╝ ██╗   ██║   ██║ ╚████║╚██████╔╝███████║
- ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
-```
-
 # 🐍 PyIDE — Professional Python Development Environment
 
-### _Created by_ **Mert Ulupınar** 🚀
+### Developed by **Mert Ulupınar** ✨
 
 [![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![PyQt5](https://img.shields.io/badge/PyQt5-5.15+-green.svg)](https://pypi.org/project/PyQt5/)
@@ -53,6 +44,16 @@ Combining power, elegance, and simplicity for Python developers of all levels.
 - **🔧 All-in-One Solution**: Code editor, terminal, debugger, and package manager in one place
 - **🎓 Beginner-Friendly**: Clean UI with intuitive controls, perfect for learning Python
 - **💪 Professional Tools**: Git integration, debugging, error highlighting for serious development
+
+---
+
+## 🚀 Recent Updates (v2.0)
+
+- **🏗️ Modular Architecture**: The massive monolithic codebase (~2500 lines) was completely refactored into a highly scalable, world-class folder structure (`core/`, `editor/`, `ui/`, `managers/`).
+- **🧠 Jedi IntelliSense**: Upgraded from static word lists to intelligent, context-aware autocompletion using the `jedi` library.
+- **🏃‍♂️ Native Code Execution**: Fixed the tempfile execution bug. Saved scripts now natively execute from their actual directory, meaning relative paths and `__file__` variables work perfectly.
+- **🔄 Dynamic Explorer Sync**: The file explorer now actively follows your context. Switching between tabs or opening new files automatically syncs the file tree and working directory to the active file's location.
+- **🌍 Language Consistency**: Fully standardized the entire UI into English for a professional, consistent developer experience.
 
 ---
 
@@ -415,23 +416,39 @@ pip install PyQt5
 
 3. **Run**:
    ```bash
-   python ide.py
+   python main.py
    ```
 
 ### 📁 Project Structure
 
-```
+```text
 pythonIDE/
 │
-├── ide.py              # Main application file
-├── requirements.txt    # Python dependencies
-├── README.md          # This file
-├── LICENSE            # MIT License
+├── main.py                  # Main application entry point
+├── requirements.txt         # Python dependencies
+├── README.md                # This file
+├── LICENSE                  # MIT License
 │
-└── icons/             # UI Icons
-    ├── folder.png     # Folder icon
-    ├── file.png       # Generic file icon
-    └── python.png     # Python file icon
+├── core/
+│   └── highlighter.py       # Syntax Highlighting engine
+├── editor/
+│   ├── code_editor.py       # Main code editor widget
+│   ├── line_number.py       # Line number area component
+│   └── minimap.py           # Code minimap navigation
+├── dialogs/
+│   └── find_replace.py      # Find & Replace dialog
+├── managers/
+│   ├── git_manager.py       # Git integration manager
+│   └── pip_manager.py       # Pip package manager
+├── widgets/
+│   ├── console.py           # Output console widget
+│   └── terminal.py          # Built-in terminal widget
+└── ui/
+    ├── main_window.py       # Main IDE window assembly
+    └── icons/               # UI Icons
+        ├── folder.png       # Folder icon
+        ├── file.png         # Generic file icon
+        └── python.png       # Python file icon
 ```
 
 ---
@@ -440,7 +457,7 @@ pythonIDE/
 
 ### Getting Started
 
-1. **Launch PyIDE**: Run `python ide.py`
+1. **Launch PyIDE**: Run `python main.py`
 2. **Open a File**:
    - Click `File → Open` or press `Ctrl+O`
    - Or double-click a file in the explorer
@@ -798,6 +815,21 @@ class ModernPythonIDE(QMainWindow):
 6. **Command Pattern**: Context menu actions (New File, Delete, Rename)
 7. **Decorator Pattern**: Debounced refresh with QTimer wrapper
 
+---
+
+## 👨‍💻 Author & Credits
+
+**Developed and Maintained by:**
+### Mert Ulupınar
+
+This IDE was crafted to provide an elegant, lightweight, and powerful Python development experience.
+
+---
+
+<div align="center">
+  <i>"Code is poetry, written with logic."</i><br><br>
+  Built with ❤️ by Mert Ulupınar
+</div>
 ---
 
 ## 🔧 Key Technologies
