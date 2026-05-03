@@ -1,27 +1,16 @@
 import sys
 import os
 import subprocess
-import ast
-import importlib
 import tempfile
 import time
 import re
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QPlainTextEdit, QTextEdit, QPushButton,
-    QLabel, QVBoxLayout, QHBoxLayout, QSplitter, QFileDialog, QAction, QTabWidget,
-    QToolBar, QMenuBar, QMessageBox, QFrame, QTreeWidget, QTreeWidgetItem, QInputDialog,
-    QDialog, QListWidget, QLineEdit, QProgressBar, QCompleter, QCheckBox, QMenu
+    QMainWindow, QWidget, QPushButton, QLabel, QVBoxLayout, QHBoxLayout,
+    QSplitter, QFileDialog, QAction, QTabWidget, QMessageBox, QFrame,
+    QTreeWidget, QTreeWidgetItem, QInputDialog, QMenu
 )
-from PyQt5.QtGui import (  
-    QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QTextCursor, QPainter, QTextFormat, QIcon, QTextDocument
-)
-from PyQt5.QtCore import QRegExp, Qt, QRect, QSize, QTimer, QProcess, QStringListModel, QFileSystemWatcher
-
-try:
-    import jedi
-    JEDI_AVAILABLE = True
-except ImportError:
-    JEDI_AVAILABLE = False
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt, QTimer, QFileSystemWatcher, QProcess
 
 from editor.code_editor import ModernCodeEditor
 from widgets.console import OutputConsole
@@ -48,7 +37,7 @@ class ModernPythonIDE(QMainWindow):
         self.ICON_FILE   = os.path.join(self.BASE_DIR, "icons", "file.png")
 
         # Pencere ayarları
-        self.tab_file_paths = {}  # Her tab için dosya yolunu sakla
+        self.tab_file_paths = {}  # {id(editor_widget): dosya_yolu} — widget referansı bazlı
         self.setWindowTitle("PyIDE - Professional Python Development Environment")
         self.setGeometry(100, 100, self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
 
@@ -663,12 +652,12 @@ class ModernPythonIDE(QMainWindow):
         
     def _on_tab_changed(self, index):
         """Aktif sekme değiştiğinde explorer'ı o dosyanın dizinine güncelle"""
-        if index in self.tab_file_paths:
-            file_path = self.tab_file_paths[index]
+        editor = self.editor_tabs.widget(index)
+        if editor and id(editor) in self.tab_file_paths:
+            file_path = self.tab_file_paths[id(editor)]
             new_dir = os.path.dirname(os.path.abspath(file_path))
             if hasattr(self, 'project_path') and self.project_path != new_dir:
                 self.project_path = new_dir
-                os.chdir(new_dir)
                 self.populate_file_tree(new_dir)
 
     def _init_console_output(self, parent_splitter):
@@ -777,6 +766,13 @@ class ModernPythonIDE(QMainWindow):
         run_action.triggered.connect(self.run_code)
         run_menu.addAction(run_action)
         
+        stop_action = QAction('⏹ Stop', self)
+        stop_action.setShortcut('Ctrl+Shift+F5')
+        stop_action.triggered.connect(self.stop_code)
+        run_menu.addAction(stop_action)
+        
+        run_menu.addSeparator()
+        
         debug_action = QAction('🐛 Debug Mode', self)
         debug_action.setShortcut('Shift+F5')
         debug_action.triggered.connect(self.run_debug)
@@ -864,6 +860,24 @@ class ModernPythonIDE(QMainWindow):
         """)
         run_btn.clicked.connect(self.run_code)
         toolbar.addWidget(run_btn)
+        
+        # Stop button
+        stop_btn = QPushButton('⏹ Stop')
+        stop_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #d32f2f;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #e53935;
+            }
+        """)
+        stop_btn.clicked.connect(self.stop_code)
+        toolbar.addWidget(stop_btn)
 
     def setup_statusbar(self):
         self.statusBar().showMessage('PyIDE Ready | Created by Mert Ulupınar 🚀')
@@ -876,21 +890,20 @@ class ModernPythonIDE(QMainWindow):
 
     def close_tab(self, index):
         # Tab'ı kapatırken dosya yolunu da temizle
-        if index in self.tab_file_paths:
-            del self.tab_file_paths[index]
+        editor = self.editor_tabs.widget(index)
+        if editor and id(editor) in self.tab_file_paths:
+            del self.tab_file_paths[id(editor)]
             
         if self.editor_tabs.count() > 1:
             self.editor_tabs.removeTab(index)
-            # Index'leri yeniden düzenle
-            self.tab_file_paths = {
-                i if i < index else i-1: path 
-                for i, path in self.tab_file_paths.items()
-            }
         else:
             # Son tab'ı kapatma, sadece temizle
             current_editor = self.editor_tabs.currentWidget()
             if current_editor:
                 current_editor.clear()
+                # Son tab'ın dosya yolunu da temizle
+                if id(current_editor) in self.tab_file_paths:
+                    del self.tab_file_paths[id(current_editor)]
 
     def get_current_editor(self):
         return self.editor_tabs.currentWidget()
@@ -907,9 +920,10 @@ class ModernPythonIDE(QMainWindow):
     def open_file_from_path(self, filename):
         """Belirtilen dosyayı aç (file tree'den veya dialog'dan)"""
         # Dosya zaten açıksa o tab'a geç
-        for tab_idx, path in self.tab_file_paths.items():
-            if path == filename:
-                self.editor_tabs.setCurrentIndex(tab_idx)
+        for i in range(self.editor_tabs.count()):
+            editor = self.editor_tabs.widget(i)
+            if editor and self.tab_file_paths.get(id(editor)) == filename:
+                self.editor_tabs.setCurrentIndex(i)
                 return
                 
         try:
@@ -918,15 +932,13 @@ class ModernPythonIDE(QMainWindow):
             
             editor = self.add_new_tab(os.path.basename(filename))
             editor.setPlainText(content)
-            tab_idx = self.editor_tabs.currentIndex()
-            self.tab_file_paths[tab_idx] = filename
+            self.tab_file_paths[id(editor)] = filename
             self.statusBar().showMessage(f'Opened: {filename}')
             
             # Açılan dosyanın dizinine göre File Explorer'ı güncelle
             new_dir = os.path.dirname(os.path.abspath(filename))
             if hasattr(self, 'project_path') and self.project_path != new_dir:
                 self.project_path = new_dir
-                os.chdir(new_dir)  # Çalışma dizinini de güncelle
                 self.populate_file_tree(new_dir)
                 
         except Exception as e:
@@ -937,8 +949,7 @@ class ModernPythonIDE(QMainWindow):
         if not current_editor:
             return
         
-        current_tab_idx = self.editor_tabs.currentIndex()
-        current_file = self.tab_file_paths.get(current_tab_idx)
+        current_file = self.tab_file_paths.get(id(current_editor))
             
         if current_file:
             try:
@@ -961,8 +972,8 @@ class ModernPythonIDE(QMainWindow):
             try:
                 with open(filename, 'w', encoding='utf-8') as file:
                     file.write(current_editor.toPlainText())
+                self.tab_file_paths[id(current_editor)] = filename
                 current_tab_idx = self.editor_tabs.currentIndex()
-                self.tab_file_paths[current_tab_idx] = filename
                 self.editor_tabs.setTabText(current_tab_idx, os.path.basename(filename))
                 self.statusBar().showMessage(f'Saved: {filename}')
             except Exception as e:
@@ -1040,13 +1051,17 @@ class ModernPythonIDE(QMainWindow):
             self.console.setText("Çalıştırılacak kod yok!")
             return
 
+        # Zaten çalışan bir process varsa durdur
+        if hasattr(self, '_run_process') and self._run_process and self._run_process.state() != QProcess.NotRunning:
+            self._run_process.kill()
+            self._run_process.waitForFinished(1000)
+
         self.console.clear()
         self.console.append("Python kodu çalıştırılıyor...\n" + "=" * 50)
 
         try:
-            current_tab_idx = self.editor_tabs.currentIndex()
-            current_file = self.tab_file_paths.get(current_tab_idx)
-            is_temp = False
+            current_file = self.tab_file_paths.get(id(current_editor))
+            self._run_is_temp = False
 
             if current_file and os.path.exists(current_file):
                 # Dosyayı kaydet ve orijinal yolunu kullan
@@ -1056,14 +1071,14 @@ class ModernPythonIDE(QMainWindow):
                 except Exception as e:
                     self.console.append(f"\n<b style='color:#f44336'>Dosya kaydedilirken hata:</b> {str(e)}")
                     return
-                target_path = current_file
+                self._run_target_path = current_file
                 cwd = os.path.dirname(current_file)
             else:
                 # Kodu geçici dosyaya kaydet
                 with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False, encoding='utf-8') as temp_file:
                     temp_file.write(code)
-                    target_path = temp_file.name
-                is_temp = True
+                    self._run_target_path = temp_file.name
+                self._run_is_temp = True
                 cwd = os.getcwd()
 
             # Input varsa yeni console penceresi aç, yoksa arka planda çalıştır
@@ -1072,66 +1087,120 @@ class ModernPythonIDE(QMainWindow):
                 self.console.append("<i>Program tamamlanınca konsol penceresi kapanacak.</i>\n")
                 
                 if sys.platform == "win32":
-                    # Windows: cmd ile aç - sys.executable kullan
                     python_exe = sys.executable.replace('\\', '/')
                     subprocess.Popen(
-                        f'start cmd /k ""{python_exe}" "{target_path}" & echo. & echo Program tamamlandi. Kapatmak icin bir tusa basin... & pause > nul & exit"',
+                        f'start cmd /k ""{python_exe}" "{self._run_target_path}" & echo. & echo Program tamamlandi. Kapatmak icin bir tusa basin... & pause > nul & exit"',
                         shell=True, cwd=cwd
                     )
                 else:
-                    # Linux/Mac: terminal ile aç
-                    subprocess.Popen(['x-terminal-emulator', '-e', f'{sys.executable} {target_path}; read -p "Press enter to close..."'], cwd=cwd)
+                    subprocess.Popen(['x-terminal-emulator', '-e', f'{sys.executable} {self._run_target_path}; read -p "Press enter to close..."'], cwd=cwd)
                 
                 self.statusBar().showMessage("Kod yeni konsol penceresinde çalışıyor")
                 
             else:
-                # Input yoksa arka planda çalıştır ve çıktıyı göster
-                current_editor.clear_error_lines()  # Önceki hataları temizle
+                # --- Asenkron çalıştırma (QProcess) ---
+                current_editor.clear_error_lines()
                 
-                process = subprocess.Popen(
-                    [sys.executable, target_path],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True,
-                    creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
-                    cwd=cwd
-                )
-
-                output, error = process.communicate(timeout=30)
-
-                if output:
-                    self.console.append(f"\n<b>Çıktı:</b>\n{output}")
-                if error:
-                    self.console.append(f"\n<b style='color:#f44336'>Hatalar:</b>\n{error}")
-                    # Hata satırlarını parse et
-                    error_lines = self._parse_error_lines(error, current_editor.toPlainText())
-                    if error_lines:
-                        current_editor.set_error_lines(error_lines)
-                        self.console.append(f"\n<i>→ Hata satırları vurgulandı: {', '.join(map(str, error_lines))}</i>")
-                        
-                if not output and not error:
-                    self.console.append("\n<b style='color:#4caf50'>✓ Kod başarıyla çalıştı (çıktı yok)</b>")
-
-                self.statusBar().showMessage("Kod çalıştırma tamamlandı")
+                self._run_process = QProcess(self)
+                self._run_process.setWorkingDirectory(cwd)
+                self._run_stdout = ""
+                self._run_stderr = ""
+                self._run_editor = current_editor
                 
-            # Geçici dosyayı sil (biraz bekle)
-            if is_temp:
-                def cleanup():
-                    time.sleep(2)
-                    try:
-                        os.unlink(target_path)
-                    except:
-                        pass
+                # Sinyalleri bağla
+                self._run_process.readyReadStandardOutput.connect(self._on_run_stdout)
+                self._run_process.readyReadStandardError.connect(self._on_run_stderr)
+                self._run_process.finished.connect(self._on_run_finished)
+                self._run_process.errorOccurred.connect(self._on_run_error)
                 
-                from threading import Thread
-                Thread(target=cleanup, daemon=True).start()
+                # Süre sayacı
+                self._run_elapsed = 0
+                self._run_timer = QTimer(self)
+                self._run_timer.timeout.connect(self._on_run_tick)
+                self._run_timer.start(1000)
+                
+                # Statusbar'da "çalışıyor" göster
+                self.statusBar().showMessage("⏳ Kod çalışıyor... (0s)")
+                
+                # Process'i başlat
+                self._run_process.start(sys.executable, [self._run_target_path])
 
-        except subprocess.TimeoutExpired:
-            process.kill()
-            self.console.append("\n<b style='color:#f44336'>Hata: Kod çalıştırma zaman aşımına uğradı (30 saniye)</b>")
         except Exception as e:
             self.console.append(f"\n<b style='color:#f44336'>Beklenmeyen hata:</b> {str(e)}")
             self.statusBar().showMessage("Hata oluştu")
+    
+    def stop_code(self):
+        """Çalışan kodu durdur"""
+        if hasattr(self, '_run_process') and self._run_process and self._run_process.state() != QProcess.NotRunning:
+            self._run_process.kill()
+            self.console.append("\n<b style='color:#ff9800'>⚠ Program kullanıcı tarafından durduruldu.</b>")
+            self.statusBar().showMessage("Program durduruldu")
+    
+    def _on_run_stdout(self):
+        """Stdout verisi geldiğinde canlı olarak konsola yaz"""
+        data = self._run_process.readAllStandardOutput().data().decode('utf-8', errors='ignore')
+        self._run_stdout += data
+        self.console.insertPlainText(data)
+    
+    def _on_run_stderr(self):
+        """Stderr verisi geldiğinde canlı olarak konsola yaz"""
+        data = self._run_process.readAllStandardError().data().decode('utf-8', errors='ignore')
+        self._run_stderr += data
+        self.console.append(f"<span style='color:#f44336'>{data}</span>")
+    
+    def _on_run_tick(self):
+        """Her saniye süre sayacını güncelle"""
+        self._run_elapsed += 1
+        self.statusBar().showMessage(f"⏳ Kod çalışıyor... ({self._run_elapsed}s)")
+    
+    def _on_run_error(self, error):
+        """QProcess hata oluştuğunda"""
+        error_messages = {
+            QProcess.FailedToStart: "Program başlatılamadı. Python yolu kontrol edin.",
+            QProcess.Crashed: "Program beklenmedik şekilde çöktü.",
+            QProcess.Timedout: "Program zaman aşımına uğradı.",
+        }
+        msg = error_messages.get(error, f"Bilinmeyen hata: {error}")
+        self.console.append(f"\n<b style='color:#f44336'>Hata:</b> {msg}")
+    
+    def _on_run_finished(self, exit_code, exit_status):
+        """Process tamamlandığında sonuçları göster"""
+        # Süre sayacını durdur
+        if hasattr(self, '_run_timer') and self._run_timer:
+            self._run_timer.stop()
+        
+        elapsed = self._run_elapsed if hasattr(self, '_run_elapsed') else 0
+        
+        # Sonuç mesajı
+        if exit_code == 0 and not self._run_stderr:
+            if not self._run_stdout:
+                self.console.append("\n<b style='color:#4caf50'>✓ Kod başarıyla çalıştı (çıktı yok)</b>")
+            self.console.append(f"\n<b style='color:#4caf50'>✓ Tamamlandı ({elapsed}s)</b>")
+        else:
+            if self._run_stderr:
+                # Hata satırlarını parse et ve editörde vurgula
+                error_lines = self._parse_error_lines(self._run_stderr, self._run_editor.toPlainText())
+                if error_lines:
+                    self._run_editor.set_error_lines(error_lines)
+                    self.console.append(f"\n<i>→ Hata satırları vurgulandı: {', '.join(map(str, error_lines))}</i>")
+            
+            if exit_status == QProcess.CrashExit:
+                self.console.append(f"\n<b style='color:#f44336'>✗ Program çöktü ({elapsed}s)</b>")
+            else:
+                self.console.append(f"\n<b style='color:#ff9800'>⚠ Çıkış kodu: {exit_code} ({elapsed}s)</b>")
+        
+        self.statusBar().showMessage(f"Kod çalıştırma tamamlandı ({elapsed}s)")
+        
+        # Geçici dosyayı temizle
+        if self._run_is_temp:
+            QTimer.singleShot(2000, lambda: self._cleanup_temp(self._run_target_path))
+    
+    def _cleanup_temp(self, path):
+        """Geçici dosyayı sil"""
+        try:
+            os.unlink(path)
+        except:
+            pass
     
     def _parse_error_lines(self, error_text, code):
         """Hata metninden satır numaralarını çıkar"""
@@ -1192,8 +1261,7 @@ class ModernPythonIDE(QMainWindow):
         self.console.append("  <b>q</b> (quit) - Çık\n")
 
         try:
-            current_tab_idx = self.editor_tabs.currentIndex()
-            current_file = self.tab_file_paths.get(current_tab_idx)
+            current_file = self.tab_file_paths.get(id(current_editor))
             is_temp = False
 
             if current_file and os.path.exists(current_file):

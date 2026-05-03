@@ -1,27 +1,8 @@
-import sys
-import os
-import subprocess
-import ast
-import importlib
-import tempfile
-import time
-import re
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QPlainTextEdit, QTextEdit, QPushButton,
-    QLabel, QVBoxLayout, QHBoxLayout, QSplitter, QFileDialog, QAction, QTabWidget,
-    QToolBar, QMenuBar, QMessageBox, QFrame, QTreeWidget, QTreeWidgetItem, QInputDialog,
-    QDialog, QListWidget, QLineEdit, QProgressBar, QCompleter, QCheckBox, QMenu
+    QDialog, QLineEdit, QLabel, QPushButton, QCheckBox, QVBoxLayout, QHBoxLayout
 )
-from PyQt5.QtGui import (  
-    QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QTextCursor, QPainter, QTextFormat, QIcon, QTextDocument
-)
-from PyQt5.QtCore import QRegExp, Qt, QRect, QSize, QTimer, QProcess, QStringListModel, QFileSystemWatcher
-
-try:
-    import jedi
-    JEDI_AVAILABLE = True
-except ImportError:
-    JEDI_AVAILABLE = False
+from PyQt5.QtGui import QTextCursor, QTextDocument
+from PyQt5.QtCore import Qt, QRegExp
 
 class FindReplaceDialog(QDialog):
     """Find & Replace dialog"""
